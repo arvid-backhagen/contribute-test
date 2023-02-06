@@ -1,26 +1,74 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { Grid, Paper } from "@mui/material";
+import { useState } from "react";
+import { AddTodo } from "./components/AddTodo";
+import { List } from "./components/List";
+import { Todo } from "./types/Todo";
 
-function App() {
+const App = () => {
+  const [todoList, setTodoList] = useState<{ [key: string]: Todo }>({});
+
+  const addToList = (todo: Todo) => {
+    setTodoList((currentList) => ({
+      ...currentList,
+      [`todo${Date.now()}`]: todo,
+    }));
+  };
+  const deleteTodo = (id: string) => {
+    setTodoList((currentList) => {
+      const shallowCopy = { ...currentList };
+      delete shallowCopy[id];
+      return shallowCopy;
+    });
+  };
+  const updateTodo = (id: string) => {
+    setTodoList((currentList) => {
+      currentList[id].status = "editing";
+
+      return { ...currentList };
+    });
+  };
+  const saveTodo = (id: string, todo: Todo) => {
+    setTodoList((currentList) => ({
+      ...currentList,
+      [id]: todo,
+    }));
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+    <>
+      <Grid container spacing={0}>
+        <Grid item xs={12}>
+          <Paper
+            style={{
+              padding: 20,
+              margin: "auto",
+              textAlign: "center",
+              width: 500,
+            }}
+          >
+            <AddTodo addToList={addToList} />
+          </Paper>
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          style={{
+            padding: 20,
+            margin: "auto",
+            textAlign: "center",
+            width: 500,
+          }}
         >
-          Learn React
-        </a>
-      </header>
-    </div>
+          <List
+            deleteTodo={deleteTodo}
+            todoList={todoList}
+            updateTodo={updateTodo}
+            saveTodo={saveTodo}
+          />
+        </Grid>
+      </Grid>
+    </>
   );
-}
+};
 
 export default App;
